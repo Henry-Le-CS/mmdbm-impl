@@ -1,0 +1,1 @@
+from src.svc.ner import Detector
