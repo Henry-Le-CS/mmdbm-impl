@@ -1,4 +1,5 @@
 import os
+import json
 from flask import request, jsonify
 from src.di.deps import Dependencies
 from werkzeug.exceptions import BadRequest, InternalServerError
@@ -35,9 +36,32 @@ def upload_video(req, route_args, deps: Dependencies):
     if file.filename == '':
         raise BadRequest("No selected file")
     
+    # extract movie title, year, and genres, actors, ratings from the request body
+    title = request.form.get("title")
+    year = request.form.get("year")
+    genres = request.form.get("genres")
+    actors = request.form.get("actors")
+    ratings = request.form.get("ratings")
+    if title is None or year is None or genres is None or actors is None or ratings is None or len(genres) == 0 or len(actors) == 0:
+        raise BadRequest("Missing required fields")
+    
+    genres = json.loads(genres)
+    actors = json.loads(actors)
+    
     try:
         metadata = deps.get_storage_svc().save_file(file)
-        # TODO: enqueue file for processing
+        deps.get_task_enqueuer().enqueue_task("upload_files", args=[
+            metadata.get("storage_path"),
+            file.content_type,
+            {
+                "title": title,
+                "year": year,
+                "genres": genres,
+                "actors": actors,
+                "ratings": ratings
+            }            
+        ])
+        
         return {"message": "File is currently processed"}
 
     except Exception as e:

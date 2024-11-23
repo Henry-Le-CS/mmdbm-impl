@@ -30,6 +30,9 @@ class Database:
                         result = conn.execute(text(sql), params)
                 else:
                     result = conn.execute(text(sql), params)
+                
+                conn.commit()
+                conn.close()                
                 return result
         except SQLAlchemyError as e:
             print(f"Database error: {e}")

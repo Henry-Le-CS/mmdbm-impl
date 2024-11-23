@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 from src.di.deps import Dependencies
 from src.db import Database
-from src.svc import Detector, QueryBuilder, SupabaseClient, StorageService
+from src.svc import Detector, QueryBuilder, SupabaseClient, StorageService, Enqueuer
 from src.http import Server
 from src.api import new_api_registry
 
@@ -26,7 +26,8 @@ if __name__ == "__main__":
                 key=os.getenv("SUPABASE_KEY"),
                 bucket_name=os.getenv("SUPABASE_BUCKET_NAME")
             ),
-            storage_svc=StorageService()
+            storage_svc=StorageService(),
+            task_enqueuer=Enqueuer(broker=os.getenv("CELERY_BROKER"))
         )
     ))
 

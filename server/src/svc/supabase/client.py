@@ -21,7 +21,7 @@ class SupabaseClient:
         self, 
         file_path: str, 
         content_type: str = "text/plain;charset=UTF-8",
-        allow_overwrite: bool = False
+        allow_overwrite: bool = True
     ):
         try:
             with open(file_path, "rb") as f:
