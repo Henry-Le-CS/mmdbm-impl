@@ -6,6 +6,7 @@ from src.di.deps import Dependencies
 from src.db import Database
 from src.svc.ner import Detector
 from src.svc.qb import QueryBuilder
+from src.svc.supabase import SupabaseClient
 
 from src.http import Server
 from src.api import new_api_registry
@@ -22,7 +23,12 @@ if __name__ == "__main__":
         deps=Dependencies(
             detector=Detector(),
             db=Database(os.getenv("DATABASE_URI")),
-            qb=QueryBuilder()
+            qb=QueryBuilder(),
+            sbc=SupabaseClient(
+                url=os.getenv("SUPABASE_URL"),
+                key=os.getenv("SUPABASE_KEY"),
+                bucket_name=os.getenv("SUPABASE_BUCKET_NAME")
+            )
         )
     ))
 

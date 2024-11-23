@@ -1,3 +1,4 @@
+import os
 from flask import request
 from src.di.deps import Dependencies
 
@@ -29,3 +30,16 @@ def get_movies(req, route_args, deps: Dependencies):
     return {
         "movies": m,
     }
+
+def upload_dummy_movies(req, route_args, deps: Dependencies):
+    try:
+        file_path = os.getcwd() + '/assets/test_image.jpg'
+        r = deps.get_sbc().upload_file(
+            file_path=file_path,
+            content_type="image/jpeg",
+            allow_overwrite=True
+        )
+        
+        return r
+    except Exception as e:
+        return str(e)

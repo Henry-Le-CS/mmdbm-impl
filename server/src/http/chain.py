@@ -1,8 +1,9 @@
-from flask import request
+from flask import request, jsonify
 from typing import List, Callable, Any
 
 from src.http.middleware import Middleware
 from src.di.deps import Dependencies
+from werkzeug.exceptions import HTTPException
 
 def Chain(deps: Dependencies, middlewares: List[Middleware], api_handler:  Callable[..., Any]) -> Callable[..., Any]:
     def chained_handler(*args: Any, **kwargs: Any) -> Any:
@@ -24,8 +25,18 @@ def wrapSuccess(data):
     return {
         "data": data
     }
-    
-def wrapError(error):
-    return {
-        "error": str(error)
-    }
+def wrapError(error): 
+    if isinstance(error, HTTPException):
+        response = jsonify({
+            "error": str(error),
+        })
+        
+        response.status_code = error.code  # Set the status code from the exception
+    else:
+        response = jsonify({
+            "error": str(error),
+        })
+        
+        response.status_code = 500  # Default to internal server error if it's not an HTTPException
+
+    return response

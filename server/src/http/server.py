@@ -23,15 +23,22 @@ class Server:
     def register_route(
         self, 
         route: str, 
-        handler: callable, 
+        handler: callable,
+        endpoint: str,
         middlewares: List[Middleware] = [], 
-        methods: List[str] = ["GET"]
-    ) -> None:
-        self.app.route(route, methods=methods)(Chain(
+        methods: List[str] = ["GET"],
+    ):        
+        self.app.route(
+                route, 
+                methods=methods,
+                endpoint=endpoint
+        )(Chain(
             self.deps,            
             middlewares, 
             handler
         ))
+        
+        return self
 
     def run(self) -> None:
         print(f"Starting server at {self.host}:{self.port}")
