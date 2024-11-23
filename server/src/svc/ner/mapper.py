@@ -20,6 +20,17 @@ _PREDICTED_ENTITY_TO_STRING = {
     'I-DIRECTOR': 'director',
     'I-RATING': 'rating',
     'I-RATINGS_AVERAGE': 'ratings_average',
+    'I-ACTOR': 'actor',
+    'I-GENRE': 'genre',
+    'I-CHARACTER': 'character',
+    'I-QUOTE': 'quote',
+    'I-ORIGIN': 'origin',
+    'I-SONG': 'song',
+    'I-TITLE': 'title',
+    'I-PLOT': 'plot',
+    'I-RELATIONSHIP': 'relationship',
+    'I-YEAR': 'year',
+    'I-TRAILER': 'trailer'
 }
 
 def get_entity_name(entity: str) -> str | None:

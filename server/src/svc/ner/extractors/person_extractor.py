@@ -15,7 +15,7 @@ CHARACETR = "character"
 
 
 # QA Model to disambiguate
-qa = AlbertQA("albert-base-v2")
+qa = AlbertQA()
 
 
 # List of actors and directors 

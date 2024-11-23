@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import List, Tuple
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine, Connection, Result
 from sqlalchemy.exc import SQLAlchemyError
@@ -22,24 +22,23 @@ class Database:
         conn = self.engine.connect()
         return conn
 
-    def execute(self, sql: str, params: Optional[dict] = None, withTx: bool = False) -> Result:
+    def execute(self, sql: str, params, withTx: bool = False) -> Result:
         try:
             with self.get_connection() as conn:
                 if withTx:
                     with conn.begin():
-                        result = conn.execute(text(sql), params or {})
+                        result = conn.execute(text(sql), params)
                 else:
-                    result = conn.execute(text(sql), params or {})
-                    
+                    result = conn.execute(text(sql), params)
                 return result
         except SQLAlchemyError as e:
             print(f"Database error: {e}")
             raise
 
-    def query(self, sql: str, params: Optional[dict] = None) -> List[dict]:
+    def query(self, sql: str, params) -> List[Tuple]:
         try:
-            result = self.execute(sql, params)
-            return [dict(row) for row in result]
+            result = self.execute(sql, params=params)
+            return [row for row in result]
         except SQLAlchemyError as e:
             print(f"Query error: {e}")
             raise

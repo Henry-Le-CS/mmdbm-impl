@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from src.di.deps import Dependencies
 from src.db import Database
 from src.svc.ner import Detector
+from src.svc.qb import QueryBuilder
 
 from src.http import Server
 from src.api import new_api_registry
@@ -20,7 +21,8 @@ if __name__ == "__main__":
         debug=os.getenv("SERVER_DEBUG_MODE", False),
         deps=Dependencies(
             detector=Detector(),
-            db=Database(os.getenv("DATABASE_URI"))
+            db=Database(os.getenv("DATABASE_URI")),
+            qb=QueryBuilder()
         )
     ))
 

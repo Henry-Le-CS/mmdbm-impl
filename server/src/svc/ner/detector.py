@@ -5,8 +5,6 @@ import logging
 
 from .lm.albert import AlbertNER
 from .extractors import *
-from src.svc.ner.checker import Checker
-from src.svc.ner.filter import Filter
 from src.svc.ner.mapper import get_entity_name
 
 from typing import List, Tuple
@@ -42,8 +40,6 @@ class Detector:
             self.year_extractor
         ]
 
-        self.filter = Filter()
-        self.checker = Checker(self.filter, df_movies)
         logging.info("Detector initialized")
 
     def get_entities(self, **kwargs: dict) -> dict:
@@ -135,16 +131,13 @@ class Detector:
         
         for extractor in self.extractors:
             kwargs = extractor.run(**kwargs)
-        
-        # filter again with data from movies 
-        kwargs, _ = self.checker.run(**kwargs)
 
         new_entities = self.parse_entities(**kwargs)
         entities = self.merge_entities(entities, new_entities)
         ret = []
         for ent in entities:
             if ent[1] == "O":
-                entities.remove(ent)
+                continue
             
             n = get_entity_name(ent[1])
             if n is None:

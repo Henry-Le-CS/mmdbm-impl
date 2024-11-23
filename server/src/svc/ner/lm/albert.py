@@ -1,6 +1,7 @@
+import logging as log
 import torch
-from transformers import  AlbertForTokenClassification, AutoTokenizer, AlbertForQuestionAnswering, logging
 from typing import List, Tuple
+from transformers import  AlbertForTokenClassification, AutoTokenizer, AlbertForQuestionAnswering, logging
 
 label_list = [
     'B-LOC', 
@@ -16,8 +17,10 @@ label_list = [
 
 logging.set_verbosity_error()
 
+
 class AlbertQA:
     def __init__(self, model_name: str = "albert-base-v2", device: str = 'cpu'):
+        log.info("Preparing AlbertQA model")
         try:
             self.tokenizer = AutoTokenizer.from_pretrained(model_name)
             self.model = AlbertForQuestionAnswering.from_pretrained(model_name)
@@ -28,7 +31,7 @@ class AlbertQA:
         self.model = self.model.eval()
         self.args = {}
         self.device = device
-            
+        log.info("AlbertQA model ready")  
 
 
     def answer(self, question: str, context: str, **kwargs: dict) -> str:
@@ -57,12 +60,14 @@ class AlbertQA:
 class AlbertNER:
     def __init__(self, model_name: str = "albert-base-v2", device: str = "cpu"):
         try:
+            log.info("Preparing AlbertNER model")
             self.tokenizer = AutoTokenizer.from_pretrained(model_name)
             self.model = AlbertForTokenClassification.from_pretrained(model_name, num_labels=9)
             self.model = self.model.eval()
         except Exception as e:
             raise e
-
+        
+        log.info("AlbertNER model ready")
     def extract(self, text: str, **kwargs: dict) -> List[Tuple[str, str]]:
         for key in kwargs:
     	    if key in self.args:
