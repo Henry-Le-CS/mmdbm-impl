@@ -4,10 +4,7 @@ from dotenv import load_dotenv
 
 from src.di.deps import Dependencies
 from src.db import Database
-from src.svc.ner import Detector
-from src.svc.qb import QueryBuilder
-from src.svc.supabase import SupabaseClient
-
+from src.svc import Detector, QueryBuilder, SupabaseClient
 from src.http import Server
 from src.api import new_api_registry
 

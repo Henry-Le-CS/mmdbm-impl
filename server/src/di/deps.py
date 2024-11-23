@@ -1,8 +1,7 @@
 import logging
-from src.svc.ner import Detector
-from src.svc.qb import QueryBuilder
-from src.svc.supabase import SupabaseClient
-from src.db.conn import Database
+
+from src.db import Database
+from src.svc import Detector, QueryBuilder, SupabaseClient
 
 class Dependencies:
     def __init__(

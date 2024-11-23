@@ -1,1 +1,1 @@
-from src.db.conn import *
+from src.db.conn import Database
