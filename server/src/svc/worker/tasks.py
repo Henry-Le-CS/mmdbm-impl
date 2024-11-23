@@ -29,7 +29,6 @@ def upload_files(
         r: Response = d.get_sbc().upload_file(localFilePath, content_type)
         
         # TODO: start transaction
-        print(metadata)
         insert_result = d.get_db().execute(
             "INSERT INTO public.movies (title, year, ratings, url) VALUES (:title, :year, :ratings, :url) RETURNING id;",
             {
@@ -43,7 +42,6 @@ def upload_files(
         [row_id] = insert_result
         row_id = row_id[0]
         if row_id is None:
-            print("insert result", insert_result)
             raise Exception("Error inserting movie")
         
 

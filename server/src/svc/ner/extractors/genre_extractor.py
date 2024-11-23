@@ -23,7 +23,6 @@ class GenreExtractor(BaseExtractor):
         pat = fr"\b(?:{'|'.join(genres)})\b"
         genres = re.findall(pat, text, re.IGNORECASE)
 
-        print("GENRES", genres)
         return genres
 
     def run(self, **kwargs: dict) -> dict:

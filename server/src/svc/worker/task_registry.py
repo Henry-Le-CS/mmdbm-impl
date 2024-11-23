@@ -7,7 +7,6 @@ class TaskRegistry:
     
     def register(self, task_name: str, handler) -> "TaskRegistry":
         self.celery.task(name=task_name)(handler)
-        print(f"Task {task_name} registered")
         return self
     
     def get_app(self):
