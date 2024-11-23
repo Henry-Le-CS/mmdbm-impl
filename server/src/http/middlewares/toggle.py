@@ -8,6 +8,6 @@ def toggle(req, route_args, deps, next_fn):
     t = route_args.get("toggle")
     if t is not None and t == "off":
         logging.info(f"[{time.time()}] {request.method} {request.path} - Toggle off")
-        raise NotFound("API is disabled")
+        raise Exception("Endpoint is disabled")
     
     return next_fn()

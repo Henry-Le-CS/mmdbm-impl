@@ -1,9 +1,9 @@
 from flask import request, jsonify
 from typing import List, Callable, Any
+from werkzeug.exceptions import HTTPException
 
 from src.http.middleware import Middleware
 from src.di.deps import Dependencies
-from werkzeug.exceptions import HTTPException
 
 def Chain(deps: Dependencies, middlewares: List[Middleware], api_handler:  Callable[..., Any]) -> Callable[..., Any]:
     def chained_handler(*args: Any, **kwargs: Any) -> Any:
@@ -25,6 +25,7 @@ def wrapSuccess(data):
     return {
         "data": data
     }
+
 def wrapError(error): 
     if isinstance(error, HTTPException):
         response = jsonify({

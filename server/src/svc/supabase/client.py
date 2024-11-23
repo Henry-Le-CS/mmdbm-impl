@@ -23,7 +23,6 @@ class SupabaseClient:
         content_type: str = "text/plain;charset=UTF-8",
         allow_overwrite: bool = False
     ):
-        print("Bucket name: ", self._bucket_name)
         try:
             with open(file_path, "rb") as f:
                 filename = file_path.split("/")[-1]
@@ -31,7 +30,7 @@ class SupabaseClient:
                     .from_(self._bucket_name) \
                     .upload(
                         file=f,
-                        path=filename, # just upload the file
+                        path=filename, # just upload the file, we do not support subfolders now
                         file_options={
                             "cache-control": "3600", 
                             "upsert": "false" if not allow_overwrite else "true",

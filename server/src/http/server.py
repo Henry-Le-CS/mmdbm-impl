@@ -1,3 +1,4 @@
+import logging
 from flask import Flask
 from typing import List
 
@@ -41,5 +42,5 @@ class Server:
         return self
 
     def run(self) -> None:
-        print(f"Starting server at {self.host}:{self.port}")
+        logging.info(f"Starting server at {self.host}:{self.port}")
         self.app.run(host=self.host, port=self.port, debug=self.debug)
