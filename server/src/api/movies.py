@@ -25,7 +25,6 @@ def list_movies(req, route_args, deps: Dependencies):
             "url": row[3]
         } for row in deps.get_db().query(q, params)
     ]
-    
     return {
         "movies": m,
     }
@@ -52,7 +51,7 @@ def upload_video(req, route_args, deps: Dependencies):
     
     try:
         metadata = deps.get_storage_svc().save_file(file)
-        job_id = deps.get_task_enqueuer().enqueue_task("upload_files", args=[
+        args = [
             metadata.get("storage_path"),
             file.content_type,
             {
@@ -61,12 +60,12 @@ def upload_video(req, route_args, deps: Dependencies):
                 "genres": genres,
                 "actors": actors,
                 "ratings": ratings
-            }            
-        ])
+            }
+        ]
         
-        q, params = deps.get_qb().build_task_management_sql(job_id, Progress.IN_PROGRESS)
+        job_id = deps.get_task_enqueuer().enqueue_task("upload_files", args=args)
+        q, params = deps.get_qb().build_task_management_sql(job_id, Progress.IN_PROGRESS, args=args)
         deps.get_db().execute(q, params)
-        
         return {
             "message": Progress.IN_PROGRESS.value,
             "job_id": job_id
