@@ -28,3 +28,12 @@ CREATE TABLE IF NOT EXISTS movie_genres (
     primary key (movie_id, genre),
     foreign key (movie_id) references movies (id) on delete cascade
 );
+
+CREATE TABLE IF NOT EXISTS tasks (
+    job_id text primary key,
+    status text,
+    args jsonb not null default '{}',
+    result jsonb not null default '{}',
+    created_at       bigint default date_part('epoch'::text, now()) not null,
+    updated_at       bigint default date_part('epoch'::text, now()) not null
+);

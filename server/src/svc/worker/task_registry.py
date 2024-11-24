@@ -11,3 +11,6 @@ class TaskRegistry:
     
     def get_app(self):
         return self.celery
+    
+
+    

@@ -52,9 +52,8 @@ Then the server is ready to receive APIs
 ### Start the worker
 Similarly, you also need to start the worker. In the server folder, run:
 ```bash
-    celery -A worker.app worker --loglevel=INFO
+    celery -A worker.app worker --loglevel=INFO --pools threads
 ```
-
 ## APIs
 
 The APIs are still developed. But you can mock some data and try it on your own.

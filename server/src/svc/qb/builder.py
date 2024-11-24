@@ -1,3 +1,6 @@
+import json
+from enum import Enum
+
 class QueryBuilder():
     def __init__(self):
         pass
@@ -40,3 +43,32 @@ class QueryBuilder():
         
         # Return the query and the dictionary of parameters
         return query, params
+
+    def build_task_management_sql(self, job_id: str, status: str | Enum, args: dict = None, result: dict = None):
+        if not job_id:
+            raise ValueError("job_id is required")
+        if not status:
+            raise ValueError("status is required")
+        
+        if isinstance(status, Enum):
+            status = status.value
+        
+        params = {
+            "job_id": job_id,
+            "status": status
+        }
+        
+        insert_part = """INSERT INTO tasks VALUES (:job_id, :status"""
+        conflict_part = " ON CONFLICT (job_id) DO UPDATE SET status = :status"
+        if args:
+            insert_part += ", :args"
+            conflict_part += ", args = :args"
+            params["args"] = json.dumps(args)
+
+        if result:
+            insert_part += ", :result"
+            conflict_part += ", result = :result"
+            params["result"] = json.dumps(result)
+
+        return insert_part + ")" + conflict_part + ";", params
+            

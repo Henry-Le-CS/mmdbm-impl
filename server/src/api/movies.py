@@ -1,8 +1,9 @@
 import os
 import json
-from flask import request, jsonify
+from flask import request
 from src.di.deps import Dependencies
-from werkzeug.exceptions import BadRequest, InternalServerError
+from src.svc import Progress
+from werkzeug.exceptions import BadRequest
 
 def get_movies(req, route_args, deps: Dependencies):
     q = request.args.get("q")
@@ -51,7 +52,7 @@ def upload_video(req, route_args, deps: Dependencies):
     
     try:
         metadata = deps.get_storage_svc().save_file(file)
-        deps.get_task_enqueuer().enqueue_task("upload_files", args=[
+        job_id = deps.get_task_enqueuer().enqueue_task("upload_files", args=[
             metadata.get("storage_path"),
             file.content_type,
             {
@@ -63,7 +64,13 @@ def upload_video(req, route_args, deps: Dependencies):
             }            
         ])
         
-        return {"message": "File is currently processed"}
+        q, params = deps.get_qb().build_task_management_sql(job_id, Progress.IN_PROGRESS)
+        deps.get_db().execute(q, params)
+        
+        return {
+            "message": Progress.IN_PROGRESS.value,
+            "job_id": job_id
+        }
 
     except Exception as e:
         raise e

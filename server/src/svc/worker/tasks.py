@@ -1,9 +1,16 @@
 import os
-
+from enum import Enum
 from httpx import Response
 from src.svc.worker.task_registry import TaskRegistry
 
+
+class Progress(Enum):
+    IN_PROGRESS = "in_progress"
+    FAILED = "failed"
+    COMPLETED = "completed"
+
 def upload_files(
+    job_id: str,
     localFilePath: str,
     content_type: str,
     metadata: dict = {},
@@ -12,7 +19,7 @@ def upload_files(
     # ref: https://stackoverflow.com/a/65547214/23303968
     from src.di import Dependencies
     from src.db import Database
-    from src.svc import SupabaseClient, StorageService
+    from src.svc import SupabaseClient, StorageService,QueryBuilder
     
     # TODO: implemen singleton pattern here
     # Must try some dependency injection here because this is not efficient            
@@ -23,12 +30,12 @@ def upload_files(
             key=os.getenv("SUPABASE_KEY"),
             bucket_name=os.getenv("SUPABASE_BUCKET_NAME")
         ),
-        db=Database(uri=os.getenv("DATABASE_URI"))
+        db=Database(uri=os.getenv("DATABASE_URI")),
+        qb=QueryBuilder()
     )
-    try:
-        
+    is_status_updated = False
+    try:        
         r: Response = d.get_sbc().upload_file(localFilePath, content_type)
-        
         # TODO: start transaction
         insert_result = d.get_db().execute(
             "INSERT INTO public.movies (title, year, ratings, url) VALUES (:title, :year, :ratings, :url) RETURNING id;",
@@ -45,7 +52,6 @@ def upload_files(
         if row_id is None:
             raise Exception("Error inserting movie")
         
-
         if metadata.get("genres"):
             for genre in metadata.get("genres"):
                 d.get_db().execute(
@@ -65,20 +71,38 @@ def upload_files(
                         "actor_name": actor
                     }
                 )
-        
+        q, params = d.get_qb().build_task_management_sql(job_id, Progress.COMPLETED, None, 
+            result = {
+            "outcome": Progress.COMPLETED.value,
+            "movie_id": row_id,
+            "full_path": r.full_path
+            })
+        d.get_db().execute(q, params)
+        is_status_updated = True
         return {
             "status": "success",
             "message": "File uploaded successfully",
             "url": r.full_path
         }
         
-    except Exception as e:
-        print("Error uploading file", e)
+    except Exception as e: 
+        q, params = d.get_qb().build_task_management_sql(job_id, Progress.FAILED, None, result = {
+            "outcome":  Progress.FAILED.value,
+            "message": str(e)
+        })       
+        d.get_db().execute(q, params)
+        is_status_updated = True
         raise e
     finally:
         d.get_storage_svc().remove_file(localFilePath)
+        if not is_status_updated:
+            q, params = d.get_qb().build_task_management_sql(job_id, Progress.FAILED, None, result = {
+                "outcome": Progress.FAILED.value,
+                "message": "Error uploading file"
+            })
+            # Marked as failed if the status is not updated        
+            d.get_db().execute(q, params)
         
-    
 
 def register_tasks(task_registry: TaskRegistry) -> TaskRegistry:
     task_registry.register("upload_files", upload_files)
