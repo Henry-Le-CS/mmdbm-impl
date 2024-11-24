@@ -36,3 +36,14 @@ class StorageService:
         except Exception as e:
             raise e
 
+    def remove_file(self, file_path: str):
+        retries = 3
+        while retries > 0:
+            try:
+                os.remove(file_path)
+                break
+            except Exception as e:
+                logging.warning(f"Error removing file: {e}")
+                retries -= 1
+                if retries == 0:
+                    raise e

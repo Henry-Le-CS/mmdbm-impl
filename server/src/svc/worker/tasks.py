@@ -8,23 +8,24 @@ def upload_files(
     content_type: str,
     metadata: dict = {},
 ):
+    # Import from here prevent process forking crash. I am not sure why this is happening for now
+    # ref: https://stackoverflow.com/a/65547214/23303968
+    from src.di import Dependencies
+    from src.db import Database
+    from src.svc import SupabaseClient, StorageService
+    
+    # TODO: implemen singleton pattern here
+    # Must try some dependency injection here because this is not efficient            
+    d = Dependencies(
+        storage_svc=StorageService(),
+        sbc=SupabaseClient(
+            url=os.getenv("SUPABASE_URL"),
+            key=os.getenv("SUPABASE_KEY"),
+            bucket_name=os.getenv("SUPABASE_BUCKET_NAME")
+        ),
+        db=Database(uri=os.getenv("DATABASE_URI"))
+    )
     try:
-        # Import from here prevent process forking crash. I am not sure why this is happening for now
-        # ref: https://stackoverflow.com/a/65547214/23303968
-        from src.di import Dependencies
-        from src.db import Database
-        from src.svc import SupabaseClient
-        
-        # TODO: implemen singleton pattern here
-        # Must try some dependency injection here because this is not efficient            
-        d = Dependencies(
-            sbc=SupabaseClient(
-                url=os.getenv("SUPABASE_URL"),
-                key=os.getenv("SUPABASE_KEY"),
-                bucket_name=os.getenv("SUPABASE_BUCKET_NAME")
-            ),
-            db=Database(uri=os.getenv("DATABASE_URI"))
-        )
         
         r: Response = d.get_sbc().upload_file(localFilePath, content_type)
         
@@ -70,10 +71,13 @@ def upload_files(
             "message": "File uploaded successfully",
             "url": r.full_path
         }
-                
+        
     except Exception as e:
         print("Error uploading file", e)
         raise e
+    finally:
+        d.get_storage_svc().remove_file(localFilePath)
+        
     
 
 def register_tasks(task_registry: TaskRegistry) -> TaskRegistry:
