@@ -3,12 +3,12 @@ from src.http import Server, Middleware
 from src.http.middlewares import log_request, authenticate, toggle
 
 # API Handlers
-from src.api.movies import get_movies, upload_dummy_movies, upload_video
+from src.api.movies import list_movies, upload_dummy_movies, upload_video
 
 def new_api_registry(s: Server) -> Server:
     s.register_route(
         "/api/movies", 
-        get_movies,
+        list_movies,
         endpoint="get_movies",
         middlewares=[Middleware(log_request),Middleware(authenticate)],
         methods=["GET"]

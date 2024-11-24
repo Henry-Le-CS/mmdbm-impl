@@ -5,7 +5,7 @@ from src.di.deps import Dependencies
 from src.svc import Progress
 from werkzeug.exceptions import BadRequest
 
-def get_movies(req, route_args, deps: Dependencies):
+def list_movies(req, route_args, deps: Dependencies):
     q = request.args.get("q")
     if q is None:
         raise Exception("Missing query parameter 'q'")
