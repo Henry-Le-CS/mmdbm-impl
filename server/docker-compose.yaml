@@ -1,0 +1,33 @@
+version: "3.11"
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my_server
+    command: python3 main.py
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+      SERVER_DEBUG_MODE: ${SERVER_DEBUG_MODE}
+      DATABASE_URI: ${DATABASE_URI}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      SUPABASE_BUCKET_NAME: ${SUPABASE_BUCKET_NAME}
+      CELERY_BROKER: ${CELERY_BROKER}
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my_worker
+    command: celery -A worker.app worker --loglevel=INFO --pool threads
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+      SERVER_DEBUG_MODE: ${SERVER_DEBUG_MODE}
+      DATABASE_URI: ${DATABASE_URI}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      SUPABASE_BUCKET_NAME: ${SUPABASE_BUCKET_NAME}
+      CELERY_BROKER: ${CELERY_BROKER}
