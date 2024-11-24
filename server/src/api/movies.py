@@ -20,7 +20,8 @@ def get_movies(req, route_args, deps: Dependencies):
         {
             "title": row[0],
             "year": row[1],
-            "ratings": row[2]
+            "ratings": row[2],
+            "url": row[3]
         } for row in deps.get_db().query(q, params)
     ]
     

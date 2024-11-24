@@ -4,7 +4,7 @@ class QueryBuilder():
     
     def build_query_movie_sql(self, opt: dict = {}):
         query = """
-            SELECT DISTINCT m.title, m.year, m.ratings
+            SELECT DISTINCT m.title, m.year, m.ratings, m.url
             FROM movies m
         """
         
