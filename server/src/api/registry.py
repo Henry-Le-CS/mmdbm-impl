@@ -10,7 +10,7 @@ def new_api_registry(s: Server) -> Server:
         "/api/movies", 
         get_movies,
         endpoint="get_movies",
-        middlewares=[ Middleware(log_request),Middleware(authenticate)],
+        middlewares=[Middleware(log_request),Middleware(authenticate)],
         methods=["GET"]
     )
     
