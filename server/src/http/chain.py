@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import jsonify
 from typing import List, Callable, Any
 from werkzeug.exceptions import HTTPException
 
@@ -27,17 +27,15 @@ def wrapSuccess(data):
     }
 
 def wrapError(error): 
-    if isinstance(error, HTTPException):
+    if isinstance(error, HTTPException):            
         response = jsonify({
-            "error": str(error),
+            "error": "Internal server error" if error.code >= 500 else str(error.description),
         })
-        
         response.status_code = error.code  # Set the status code from the exception
     else:
         response = jsonify({
             "error": str(error),
         })
-        
         response.status_code = 500  # Default to internal server error if it's not an HTTPException
 
     return response
