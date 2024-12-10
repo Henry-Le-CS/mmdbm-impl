@@ -7,7 +7,7 @@ class QueryBuilder():
     
     def build_query_movie_sql(self, opt: dict = {}):
         query = """
-            SELECT DISTINCT m.title, m.year, m.ratings, m.url
+            SELECT DISTINCT m.title, m.year, m.ratings, m.url, m.id
             FROM movies m
         """
         
@@ -24,9 +24,8 @@ class QueryBuilder():
 
         if 'actor' in opt and len(opt['actor']) > 0:
             query += " JOIN movie_actors ma ON m.id = ma.movie_id"
-            query += " JOIN actors a ON ma.actor_id = a.id"
             actor_placeholder = [f":actor{idx}" for idx in range(len(opt['actor']))]
-            condition = f"a.name ILIKE ANY(ARRAY[{', '.join(actor_placeholder)}])"
+            condition = f"ma.actor_name ILIKE ANY(ARRAY[{', '.join(actor_placeholder)}])"
             where_conditions.append(condition)
             for idx, actor in enumerate(opt['actor']):
                 params[f'actor{idx}'] = f"%{actor}%"

@@ -22,7 +22,8 @@ def list_movies(req, route_args, deps: Dependencies):
             "title": row[0],
             "year": row[1],
             "ratings": row[2],
-            "url": row[3]
+            "url": row[3],
+            "id": row[4]
         } for row in deps.get_db().query(q, params)
     ]
     return {
